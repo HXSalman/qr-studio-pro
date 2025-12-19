@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Studio Pro | @buildWithSalman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .config-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        input[type="color"] { border: none; width: 100%; height: 40px; cursor: pointer; background: none; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 8px; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col py-12 px-4">
+
+    <div class="max-w-4xl mx-auto flex-grow">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">QR Studio Pro</h1>
+            <p class="text-slate-500 mt-2">Customize every detail of your QR code instantly. (Free forever)</p>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+            <div class="config-card p-8 rounded-3xl border border-white shadow-xl space-y-6">
+                
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Content / URL</label>
+                    <textarea id="qr-data" rows="3" placeholder="Paste your link or text here..." 
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"></textarea>
+                        <span class="text-xs text-slate-400">Perfect for URLs, contact info, WiFi passwords, and more</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Size (px)</label>
+                        <input type="number" id="qr-size" value="400" 
+                            class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Margin</label>
+                        <input type="number" id="qr-margin" value="1" min="0" max="10"
+                            class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">QR Color</label>
+                        <input type="color" id="qr-color" value="#000000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Background</label>
+                        <input type="color" id="qr-bg" value="#ffffff">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">File Format</label>
+                    <select id="qr-format" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none bg-white">
+                        <option value="png">PNG (Standard)</option>
+                        <option value="svg">SVG (Vector/High Quality)</option>
+                        <option value="jpg">JPG</option>
+                    </select>
+                </div>
+
+                <button onclick="generateQR()" 
+                    class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98]">
+                    Generate Code
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div id="preview-box" class="w-full aspect-square bg-white rounded-3xl shadow-2xl flex items-center justify-center p-8 border border-slate-100 overflow-hidden relative">
+                    <p id="placeholder-text" class="text-slate-400 font-medium">Preview will appear here</p>
+                    <img id="qr-image" class="hidden max-w-full h-auto drop-shadow-md" src="" alt="QR Code">
+                </div>
+
+                <div id="action-buttons" class="hidden mt-6 w-full">
+                    <button onclick="downloadQR()" 
+                        class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download Asset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-12 text-center">
+        <p class="text-slate-400 text-sm font-medium tracking-wide">
+            © <script>document.write(new Date().getFullYear())</script> Crafted with ❤️ by 
+            <span class="text-slate-600 font-bold">@buildWithSalman</span>
+        </p>
+    </footer>
+
+    <script>
+        function generateQR() {
+            const data = document.getElementById('qr-data').value;
+            const size = document.getElementById('qr-size').value || 400;
+            const margin = document.getElementById('qr-margin').value || 1;
+            const color = document.getElementById('qr-color').value.substring(1); 
+            const bgcolor = document.getElementById('qr-bg').value.substring(1); 
+            const format = document.getElementById('qr-format').value;
+
+            const qrImage = document.getElementById('qr-image');
+            const placeholder = document.getElementById('placeholder-text');
+            const actionButtons = document.getElementById('action-buttons');
+
+            if (!data) {
+                alert("Please enter some text or a URL!");
+                return;
+            }
+
+            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}&color=${color}&bgcolor=${bgcolor}&margin=${margin}&format=${format}`;
+            
+            qrImage.src = apiUrl;
+            
+            qrImage.onload = () => {
+                placeholder.classList.add('hidden');
+                qrImage.classList.remove('hidden');
+                actionButtons.classList.remove('hidden');
+            };
+        }
+
+        async function downloadQR() {
+            const qrImage = document.getElementById('qr-image');
+            const format = document.getElementById('qr-format').value;
+            
+            try {
+                const response = await fetch(qrImage.src);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `qrcode-${Date.now()}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error("Download failed", error);
+                alert("Sorry, could not download the file.");
+            }
+        }
+    </script>
+</body>
+</html>
